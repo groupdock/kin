@@ -9,7 +9,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "nodeunit ./test/*"
+    "test": "nodeunit ./tests/"
   },
   "engines": {
     "node": "~0.6"
