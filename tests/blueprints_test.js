@@ -17,33 +17,21 @@ var seed
 
 var tests = testCase({
   setUp: function(callback) {
-    Step(
-      function() {
-        h.dropCollections(this)
-      },
-      function() {
-        seed = new Seed()
-        // be aware, the function string
-        // itself acts as the key to the blueprint
-        User = function(properties) {
-          // user
-          this._id = uuid()
-          Object.merge(this, Object.clone(properties))
-
-        }
-        Stream = function(properties) {
-          // stream
-          this._id = uuid()
-          Object.merge(this, Object.clone(properties))
-        }
-        Activity = function(properties) {
-          // activity
-          this._id = uuid()
-          Object.merge(this, Object.clone(properties))
-        }
-        callback()
-      }
-    )
+    seed = new Seed()
+    // mock 'models'
+    User = function(properties) {
+      this._id = uuid()
+      Object.merge(this, Object.clone(properties))
+    }
+    Stream = function(properties) {
+      this._id = uuid()
+      Object.merge(this, Object.clone(properties))
+    }
+    Activity = function(properties) {
+      this._id = uuid()
+      Object.merge(this, Object.clone(properties))
+    }
+    callback()
   },
   'is sane': function(test) {
     test.ok(seed)
