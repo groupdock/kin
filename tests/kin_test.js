@@ -347,17 +347,15 @@ var tests = testCase({
               callback(err, value + '@example.com')
             })
           },
-
         })
         kin.generate('User', function(err, model) {
           if (err) throw err
-          test.equal('joe@example.com', model.email)
           test.equal('joe@example.com', model.email)
           test.equal('joe@example.com@example.com', model.email2)
           test.done()
         })
       },
-      'test can reference other function properties via `this` in blueprint function when not in order': function(test) {
+      'test can reference other function properties via `this` in blueprint function when in order': function(test) {
         kin.blueprint('User', {
           _model: User,
           username: function(callback) {
@@ -671,7 +669,9 @@ var tests = testCase({
           callback(null, Faker.Company.catchPhrase())
         },
         _activities: function(callback) {
-          kin.get('_id', function(err, id) {
+          Kin.get(this, '_id', function(err, id) {
+						if (err) throw err
+						test.ok(id)
             kin.generate('Activity', {streamId: id}, function(err, activity) {
               activities.push(activity)
               callback(err, activity)
@@ -724,7 +724,9 @@ var tests = testCase({
             callback(null, Faker.Company.catchPhrase())
           },
           _activities: function(callback) {
-            kin.get('_id', function(err, id) {
+            Kin.get(this, '_id', function(err, id) {
+							if (err) throw err
+							test.ok(id)
               kin.generate('Activity', {streamId: id}, function(err, activity) {
                 activities.push(activity)
                 callback(err, activity)
