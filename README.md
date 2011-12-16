@@ -1,8 +1,12 @@
 # Kin — Automated Fixture Hierarchy Generation
 
 ### Authors
-* Tim Oxley https://github.com/secoif
-* Geoffrey Donaldson https://github.com/geoffreyd
+* Tim Oxley [https://github.com/secoif](https://github.com/secoif
+)
+* Geoffrey Donaldson [https://github.com/geoffreyd](https://github.com/geoffreyd
+)
+
+We recommend the use of [Faker](https://github.com/marak/Faker.js/) for generating test data.
 
 #  Examples
 
