@@ -5,7 +5,8 @@ var testCase = require('nodeunit').testCase,
     Blueprints = require('../lib/blueprints'),
     uuid = require('node-uuid'),
     ObjectId = require('mongoose').Types.ObjectId,
-    Faker = require('Faker')
+    Faker = require('Faker'),
+    _ = require('underscore')
 
 var User,
     Stream,
@@ -20,15 +21,15 @@ var tests = testCase({
     // mock 'models'
     User = function(properties) {
       this._id = uuid()
-      Object.merge(this, Object.clone(properties))
+      _.extend(this, _.clone(properties))
     }
     Stream = function(properties) {
       this._id = uuid()
-      Object.merge(this, Object.clone(properties))
+      _.extend(this, _.clone(properties))
     }
     Activity = function(properties) {
       this._id = uuid()
-      Object.merge(this, Object.clone(properties))
+      _.extend(this, _.clone(properties))
     }
     callback()
   },
@@ -87,9 +88,12 @@ var tests = testCase({
         function(callback) {
           callback(null, 'item')
         }, 5,
-        function(err, result) {
-          test.equal(5, result.length)
-          test.ok(result.every('item'))
+        function(err, results) {
+          if (err) throw err
+          test.equal(5, results.length)
+          test.ok(_.every(results, function(result) {
+            return result == 'item'
+          }))
           test.done()
         }
       )
@@ -100,9 +104,12 @@ var tests = testCase({
           test.ok(this.prop == 'hello')
           callback(null, 'item')
         }, 5,
-        function(err, result) {
-          test.equal(5, result.length)
-          test.ok(result.every('item'))
+        function(err, results) {
+          if (err) throw err
+          test.equal(5, results.length)
+          test.ok(_.every(results, function(result) {
+            return result == 'item'
+          }))
           test.done()
         })
     },
@@ -114,9 +121,12 @@ var tests = testCase({
       }, {
         users: 5,
       },
-      function(err, result) {
-        test.equal(5, result.users.length)
-        test.ok(result.users.every('item'))
+      function(err, results) {
+        if (err) throw err
+        test.equal(5, results.users.length)
+        test.ok(_.every(results.users, function(result) {
+          return result == 'item'
+        }))
         test.done()
       })
     },
@@ -416,11 +426,11 @@ var tests = testCase({
         test.equal('joe', user.username)
         test.ok(user.streams)
         test.equal(3, user.streams.length)
-        test.ok(user.streams.every(function(stream) {
+        test.ok(_.every(user.streams, function(stream) {
           return stream instanceof Stream
         }))
-        test.ok(user.streams.every(function(stream) {
-          return stream.title.startsWith('stream')
+        test.ok(_.every(user.streams, function(stream) {
+          return /^stream/.test(stream.title)
         }))
         test.done()
       })
@@ -447,7 +457,7 @@ var tests = testCase({
         test.equal('joe', user.username)
         test.ok(user.streams)
         test.equal(6, user.streams.length)
-        test.ok(user.streams.every(function(stream) {
+        test.ok(_.every(user.streams, function(stream) {
           return typeof stream == 'string'
         }))
         test.done()
@@ -475,7 +485,7 @@ var tests = testCase({
         test.equal('bill', user.username)
         test.ok(user.streams)
         test.equal(5, user.streams.length)
-        test.ok(user.streams.every(function(stream) {
+        test.ok(_.every(user.streams, function(stream) {
           return typeof stream == 'string'
         }))
         test.done()
@@ -507,7 +517,7 @@ var tests = testCase({
         test.ok(!user._streams)
         test.ok(!user.streams)
         test.equal(5, streams.length)
-        test.ok(streams.every(function(stream) {
+        test.ok(_.every(streams, function(stream) {
           return stream.userId == user._id
         }))
         test.done()
@@ -544,7 +554,7 @@ var tests = testCase({
         test.deepEqual(['4', '4', '4', '4', '4'], streams.map(function(stream) {
           return stream.title
         }))
-        test.ok(streams.every(function(stream) {
+        test.ok(_.every(streams, function(stream) {
           return stream.userId == user._id
         }))
         test.done()
@@ -643,7 +653,7 @@ var tests = testCase({
       blueprints.generate('User', {streams: 3}, function(err, user) {
         test.equal(3, user.streams.length)
         test.equal(5 * user.streams.length, titles.length)
-        test.ok(user.streams.every(function(stream) {
+        test.ok(_.every(user.streams, function(stream) {
           return stream.userId == user._id
         }))
         test.done()
@@ -765,7 +775,7 @@ var tests = testCase({
           test.done()
         })
       }
-    }),
+    })
   }
 })
 
