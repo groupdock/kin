@@ -6,7 +6,7 @@
 
 #  Examples
 
-¶
+
 
     
     var Kin = require('../../lib/kin')
@@ -15,11 +15,11 @@
     
     var kin = new Kin()
 
-¶
+
 
 ## Fixed Values
 
-¶
+
 
 Create a User blueprint with fixed values for it's properties
 
@@ -28,7 +28,7 @@ Create a User blueprint with fixed values for it's properties
       email: 'joe@example.com'
     })
 
-¶
+
 
 Generate a User object. The returned user will have the properties supplied in
 the template.
@@ -42,7 +42,7 @@ the template.
       assert.deepEqual(user, expected)
     })
 
-¶
+
 
 If we generate another User, we'll get the same values every time
 
@@ -54,11 +54,11 @@ If we generate another User, we'll get the same values every time
       })
     })
 
-¶
+
 
 ## Dynamic Values
 
-¶
+
 
 Only generating fixed values isn't very useful. We can define functions to
 generate our object properties.
@@ -78,7 +78,7 @@ generate our object properties.
       assert.ok(user.email) // some random email as defined by Faker, eg "Brook_Bednar@price.us"
     })
 
-¶
+
 
 Generating another user should always run the matching generation function,
 generating different data each time
@@ -95,20 +95,13 @@ generating different data each time
       assert.equal(user.username, 'bill') // uses the overridden value
     })
 
-¶
+
 
 ## Overriding values at generation time
+TODO
 
-¶
 
 ## Multiple Values
+TODO
 
-¶
-
-Sometimes we need to generate many objects
-
-    
-    kin.blueprint('')
-    
-    
 
