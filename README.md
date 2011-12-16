@@ -1,4 +1,4 @@
-# Kin &emdash Automate Fixture Hierarchies
+# Kin — Automated Fixture Hierarchy Generation
 
 ### Authors
 * Tim Oxley https://github.com/secoif
