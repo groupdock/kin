@@ -6,22 +6,12 @@
 * Geoffrey Donaldson [https://github.com/geoffreyd](https://github.com/geoffreyd
 )
 
-
-We recommend the use of [Faker](https://github.com/marak/Faker.js/) for generating test data.
+## Sponsor
+[Intellum] (http://www.intellum.com/)
 
 #  Examples
 
-```javascript
-    var Kin = require('../../lib/kin')
-    var Faker = require('Faker')
-    var assert = require('assert')
-    var _ = require('underscore')
-    
-    var uuid = require('node-uuid').v1
-    
-    var kin = new Kin()
-```
-
+We recommend the use of [Faker](https://github.com/marak/Faker.js/) for generating test data.
 
 ## Fixed Values
 
