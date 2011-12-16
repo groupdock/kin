@@ -343,11 +343,11 @@ manually `require` every model in your system.
 
 
 If you want to reference another property from within a generator, use
-`kin.get('someProperty')`.
+`Kin.get(this, 'someProperty')`.
 
 Because we 'simultaneously' execute each generator function, there's no
 guarantee that the generator will have run by the time we're referencing it
-within another property generator. `kin.get` ensures the property's generator
+within another property generator. `Kin.get` ensures the property's generator
 has returned a value.
 
 
