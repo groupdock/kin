@@ -6,20 +6,7 @@
 
 #  Examples
 
-
-
-    
-    var Kin = require('../../lib/kin')
-    var Faker = require('Faker')
-    var assert = require('assert')
-    
-    var kin = new Kin()
-
-
-
 ## Fixed Values
-
-
 
 Create a User blueprint with fixed values for it's properties
 
@@ -59,8 +46,6 @@ kin.generate('User', function(err, user) {
 
 ## Dynamic Values
 
-
-
 Only generating fixed values isn't very useful. We can define functions to
 generate our object properties.
 
@@ -80,7 +65,6 @@ kin.generate('User', function(err, user) {
 })
 ```
 
-
 Generating another user should always run the matching generation function,
 generating different data each time
 
@@ -97,10 +81,8 @@ kin.generate('User', {username: 'bill'}, function(err, user) {
 })
 ```
 
-
 ## Overriding values at generation time
 TODO
-
 
 ## Multiple Values
 TODO
