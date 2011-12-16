@@ -1,7 +1,6 @@
 'use strict'
 
 var testCase = require('nodeunit').testCase,
-    Step = require('step'),
     EventEmitter = require('events').EventEmitter,
     Seed = require('../lib/blueprints'),
     uuid = require('node-uuid'),
@@ -172,7 +171,6 @@ var tests = testCase({
       })
       seed.generate('User', function(err, model) {
         if (err) throw err
-
         test.ok(model && model instanceof User)
         test.done()
       })
@@ -185,7 +183,6 @@ var tests = testCase({
 
       seed.generate('User', {username: 'joe'}, function(err, model) {
         if (err) throw err
-
         test.equal('joe', model.username)
         test.done()
       })
@@ -210,7 +207,6 @@ var tests = testCase({
         })
         seed.generate('User', function(err, model) {
           if (err) throw err
-
           test.equal('joe', model.username)
           test.equal('joe@example.com', model.email)
           test.done()
@@ -239,7 +235,6 @@ var tests = testCase({
           })
           seed.generate('User', {username: 'bill'}, function(err, model) {
             if (err) throw err
-
             test.equal('bill', model.username)
             test.done()
           })
@@ -252,7 +247,6 @@ var tests = testCase({
           })
           seed.generate('User', {username: 'bill', email: 'bill@example.com'}, function(err, model) {
             if (err) throw err
-
             test.equal('bill', model.username)
             test.equal('bill@example.com', model.email)
             test.done()
@@ -266,7 +260,6 @@ var tests = testCase({
           })
           seed.generate('User', {username: 'bill', email: 'bill@example.com'}, function(err, model) {
             if (err) throw err
-
             test.equal('bill', model.username)
             test.equal('bill@example.com', model.email)
             test.done()
@@ -280,7 +273,6 @@ var tests = testCase({
           })
           seed.generate('User', {username: 'bill'}, function(err, model) {
             if (err) throw err
-
             test.equal('bill', model.username)
             test.equal('joe@example.com', model.email)
             test.done()
@@ -296,7 +288,6 @@ var tests = testCase({
         })
         seed.generate('User', function(err, model) {
           if (err) throw err
-
           test.equal('joe', model.username)
           test.done()
         })
@@ -311,7 +302,6 @@ var tests = testCase({
         })
         seed.generate('User', function(err, model) {
           if (err) throw err
-
           test.equal('joe@example.com', model.email)
           test.equal('joe@example.com', model.email)
           test.done()
@@ -329,7 +319,6 @@ var tests = testCase({
         })
         seed.generate('User', function(err, model) {
           if (err) throw err
-
           test.equal('joe@example.com', model.email)
           test.done()
         })
@@ -352,7 +341,6 @@ var tests = testCase({
         })
         seed.generate('User', function(err, model) {
           if (err) throw err
-
           test.equal('joe@example.com', model.email)
           test.equal('joe@example.com', model.email)
           test.equal('joe@example.com@example.com', model.email2)
@@ -371,7 +359,6 @@ var tests = testCase({
         })
         seed.generate('User', function(err, model) {
           if (err) throw err
-
           test.equal('joe@example.com', model.email)
           test.done()
         })
@@ -408,7 +395,6 @@ var tests = testCase({
       })
       seed.generate('User', function(err, user) {
         if (err) throw err
-
         test.equal('joe', user.username)
         test.ok(user.streams && typeof user.streams == 'string')
         test.done()
@@ -427,7 +413,6 @@ var tests = testCase({
       })
       seed.generate('User', {streams: 3}, function(err, user) {
         if (err) throw err
-
         test.equal('joe', user.username)
         test.ok(user.streams)
         test.equal(3, user.streams.length)
@@ -459,7 +444,6 @@ var tests = testCase({
       })
       seed.generate('User', {streams: 6}, function(err, user) {
         if (err) throw err
-
         test.equal('joe', user.username)
         test.ok(user.streams)
         test.equal(6, user.streams.length)
@@ -488,7 +472,6 @@ var tests = testCase({
       })
       seed.generate('User', {username: 'bill', streams: 5}, function(err, user) {
         if (err) throw err
-
         test.equal('bill', user.username)
         test.ok(user.streams)
         test.equal(5, user.streams.length)
@@ -529,7 +512,6 @@ var tests = testCase({
         }))
         test.done()
       })
-
     },
     'generate _ properties doesn\'t actually create the property, and can be referenced': function(test) {
       seed.blueprint('Stream', {
