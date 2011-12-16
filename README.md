@@ -7,6 +7,7 @@
 )
 
 ## Sponsor
+[Luc Castera] (https://github.com/dambalah)
 [Intellum] (http://www.intellum.com/)
 
 #  Examples
