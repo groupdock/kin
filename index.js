@@ -1,1 +1,1 @@
-module.exports = require('./lib/blueprints');
+module.exports = require('./lib/kin');

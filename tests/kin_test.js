@@ -2,7 +2,7 @@
 
 var testCase = require('nodeunit').testCase,
     EventEmitter = require('events').EventEmitter,
-    Blueprints = require('../lib/blueprints'),
+    Kin = require('../lib/kin'),
     uuid = require('node-uuid'),
     ObjectId = require('mongoose').Types.ObjectId,
     Faker = require('Faker'),
@@ -13,11 +13,11 @@ var User,
     Activity,
     activities
 
-var blueprints
+var kin
 
 var tests = testCase({
   setUp: function(callback) {
-    blueprints = new Blueprints()
+    kin = new Kin()
     // mock 'models'
     User = function(properties) {
       this._id = uuid()
@@ -34,19 +34,19 @@ var tests = testCase({
     callback()
   },
   'is sane': function(test) {
-    test.ok(blueprints)
-    test.ok(typeof blueprints.generate == 'function')
-    test.ok(typeof blueprints.blueprint == 'function')
+    test.ok(kin)
+    test.ok(typeof kin.generate == 'function')
+    test.ok(typeof kin.blueprint == 'function')
     test.done()
   },
   'should err if no type': function(test) {
-    blueprints.generate('', function(err, model) {
+    kin.generate('', function(err, model) {
       test.ok(err)
       test.done()
     })
   },
   'should err if invalid type': function(test) {
-    blueprints.generate('ksjhdfb', function(err, model) {
+    kin.generate('ksjhdfb', function(err, model) {
       test.ok(err)
       test.done()
     })
@@ -59,13 +59,13 @@ var tests = testCase({
       },
       user: 'tim'
     }
-    blueprints.blueprint('User', userBlueprint)
-    test.deepEqual(userBlueprint, blueprints.blueprint('User'))
+    kin.blueprint('User', userBlueprint)
+    test.deepEqual(userBlueprint, kin.blueprint('User'))
     test.done()
   },
   'should not return _ properties': function(test) {
     var count = 0
-    blueprints.blueprint('User', {
+    kin.blueprint('User', {
       _count: function(callback) {
         count++
         callback(null, count)
@@ -73,7 +73,7 @@ var tests = testCase({
       user: 'tim'
     })
 
-    blueprints.generate('User', function(err, model) {
+    kin.generate('User', function(err, model) {
       if (err) throw err
       test.ok(!err)
       test.equal('tim', model.user)
@@ -84,7 +84,7 @@ var tests = testCase({
   },
   'link': {
     'evaluateProperty count times':function(test) {
-      Blueprints.evaluateProperty({},
+      Kin.evaluateProperty({},
         function(callback) {
           callback(null, 'item')
         }, 5,
@@ -99,7 +99,7 @@ var tests = testCase({
       )
     },
     'evaluateProperty count times with a context':function(test) {
-      Blueprints.evaluateProperty({prop: 'hello'},
+      Kin.evaluateProperty({prop: 'hello'},
         function(callback) {
           test.ok(this.prop == 'hello')
           callback(null, 'item')
@@ -114,7 +114,7 @@ var tests = testCase({
         })
     },
     'linkProperties count times':function(test) {
-      blueprints.linkProperties({
+      kin.linkProperties({
         users: function(callback) {
           callback(null, 'item')
         }
@@ -132,9 +132,9 @@ var tests = testCase({
     },
   },
   'can evaluate properties of object using get': {
-    'blueprints.setgenerator sets isGenerator': function(test) {
+    'kin.setgenerator sets isGenerator': function(test) {
       var obj = {}
-      blueprints.generator(obj)
+      kin.generator(obj)
       test.ok(obj.isGenerator)
       test.done()
     },
@@ -144,7 +144,7 @@ var tests = testCase({
           callback(null, 'thang')
         }
       }
-      Blueprints.get(obj, 'thing', function(err, value) {
+      Kin.get(obj, 'thing', function(err, value) {
         test.ok(!err)
         test.equal('thang', value)
         test.equal('thang', obj.thing)
@@ -153,11 +153,11 @@ var tests = testCase({
     },
     'should return function if isGenerator': function(test) {
       var obj = {
-        thing: blueprints.generator(function(callback) {
+        thing: kin.generator(function(callback) {
           callback(null, 'thang')
         })
       }
-      Blueprints.get(obj, 'thing', function(err, value) {
+      Kin.get(obj, 'thing', function(err, value) {
         test.ok(!err)
         test.ok(value.isGenerator)
         test.ok(typeof value == 'function')
@@ -166,7 +166,7 @@ var tests = testCase({
     },
     'should throw err if property doesn\'t exist': function(test) {
       var obj = {}
-      Blueprints.get(obj, 'thing', function(err, value) {
+      Kin.get(obj, 'thing', function(err, value) {
         test.ok(err)
         test.strictEqual(undefined, obj.thing)
         test.done()
@@ -175,23 +175,23 @@ var tests = testCase({
   },
   'generate': {
     'should generate models': function(test) {
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe'
       })
-      blueprints.generate('User', function(err, model) {
+      kin.generate('User', function(err, model) {
         if (err) throw err
         test.ok(model && model instanceof User)
         test.done()
       })
     },
     'should generate model with supplied properties': function(test) {
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe'
       })
 
-      blueprints.generate('User', {username: 'joe'}, function(err, model) {
+      kin.generate('User', {username: 'joe'}, function(err, model) {
         if (err) throw err
         test.equal('joe', model.username)
         test.done()
@@ -199,23 +199,23 @@ var tests = testCase({
     },
     'should generate based on object blueprint': {
       'single property': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           username: 'joe'
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe', model.username)
           test.done()
         })
       },
       'multiple properties': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           username: 'joe',
           email: 'joe@example.com'
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe', model.username)
           test.equal('joe@example.com', model.email)
@@ -223,14 +223,14 @@ var tests = testCase({
         })
       },
       'numeric properties': function(test) {
-          blueprints.blueprint('User', {
+          kin.blueprint('User', {
             _model: User,
             _userNum: 3,
             email: function(callback) {
               callback(null, 'user'+this._userNum+'@example.com')
             }
           })
-          blueprints.generate('User', {username: 'bill'}, function(err, model) {
+          kin.generate('User', {username: 'bill'}, function(err, model) {
             if (err) throw err
             test.equal('bill', model.username)
             test.equal('user3@example.com', model.email)
@@ -239,23 +239,23 @@ var tests = testCase({
         },
       'supplied properties should overwrite blueprint': {
         'single property': function(test) {
-          blueprints.blueprint('User', {
+          kin.blueprint('User', {
             _model: User,
             username: 'joe'
           })
-          blueprints.generate('User', {username: 'bill'}, function(err, model) {
+          kin.generate('User', {username: 'bill'}, function(err, model) {
             if (err) throw err
             test.equal('bill', model.username)
             test.done()
           })
         },
         'multiple properties': function(test) {
-          blueprints.blueprint('User', {
+          kin.blueprint('User', {
             _model: User,
             username: 'joe',
             email: 'joe@example.com'
           })
-          blueprints.generate('User', {username: 'bill', email: 'bill@example.com'}, function(err, model) {
+          kin.generate('User', {username: 'bill', email: 'bill@example.com'}, function(err, model) {
             if (err) throw err
             test.equal('bill', model.username)
             test.equal('bill@example.com', model.email)
@@ -264,11 +264,11 @@ var tests = testCase({
         }, 
 
         'if blueprint properties don\'t exist': function(test) {
-          blueprints.blueprint('User', {
+          kin.blueprint('User', {
             _model: User,
             username: 'joe',
           })
-          blueprints.generate('User', {username: 'bill', email: 'bill@example.com'}, function(err, model) {
+          kin.generate('User', {username: 'bill', email: 'bill@example.com'}, function(err, model) {
             if (err) throw err
             test.equal('bill', model.username)
             test.equal('bill@example.com', model.email)
@@ -276,12 +276,12 @@ var tests = testCase({
           })
         },
         'if supplied properties don\'t exist': function(test) {
-          blueprints.blueprint('User', {
+          kin.blueprint('User', {
             _model: User,
             username: 'joe',
             email: 'joe@example.com'
           })
-          blueprints.generate('User', {username: 'bill'}, function(err, model) {
+          kin.generate('User', {username: 'bill'}, function(err, model) {
             if (err) throw err
             test.equal('bill', model.username)
             test.equal('joe@example.com', model.email)
@@ -290,27 +290,27 @@ var tests = testCase({
         }
       },
       'should generate based on object blueprint with function': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           username: function(callback) {
             callback(null, 'joe')
           }
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe', model.username)
           test.done()
         })
       },
       'test can reference other properties via `this` in blueprint function': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           email: function(callback) {
             callback(null, this.username + '@example.com')
           },
           username: 'joe',
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe@example.com', model.email)
           test.equal('joe@example.com', model.email)
@@ -318,7 +318,7 @@ var tests = testCase({
         })
       },
       'test can reference other function properties via `this` in blueprint function': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           username: function(callback) {
             callback(null, 'joe')
@@ -327,29 +327,29 @@ var tests = testCase({
             callback(null, this.username + '@example.com')
           }
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe@example.com', model.email)
           test.done()
         })
       },
       'test can reference other properties via `this` in blueprint function when referencing out of order': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           username: 'joe',
           email2: function(callback) {
-            Blueprints.get(this, 'email', function(err, value) {
+            Kin.get(this, 'email', function(err, value) {
               callback(err, value + '@example.com')
             })
           },
           email: function(callback) {
-            Blueprints.get(this, 'username', function(err, value) {
+            Kin.get(this, 'username', function(err, value) {
               callback(err, value + '@example.com')
             })
           },
 
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe@example.com', model.email)
           test.equal('joe@example.com', model.email)
@@ -358,7 +358,7 @@ var tests = testCase({
         })
       },
       'test can reference other function properties via `this` in blueprint function when not in order': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           username: function(callback) {
             callback(null, 'joe')
@@ -367,7 +367,7 @@ var tests = testCase({
             callback(null, this.username + '@example.com')
           }
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
           test.equal('joe@example.com', model.email)
           test.done()
@@ -375,11 +375,11 @@ var tests = testCase({
       },
     },
     'callback context is the generated object': function(test) {
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe',
       })
-      blueprints.generate(
+      kin.generate(
         'User', 
         {
           email: function(callback) {
@@ -393,7 +393,7 @@ var tests = testCase({
         })
     },
     'generate can link properties': function(test) {
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe',
         streams: (function(callback) {
@@ -403,7 +403,7 @@ var tests = testCase({
           callback(null, stream._id)
         })
       })
-      blueprints.generate('User', function(err, user) {
+      kin.generate('User', function(err, user) {
         if (err) throw err
         test.equal('joe', user.username)
         test.ok(user.streams && typeof user.streams == 'string')
@@ -411,7 +411,7 @@ var tests = testCase({
       })
     },
     'generate can link properties with count': function(test) {
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe',
         streams: (function(callback) {
@@ -421,7 +421,7 @@ var tests = testCase({
           callback(null, stream)
         })
       })
-      blueprints.generate('User', {streams: 3}, function(err, user) {
+      kin.generate('User', {streams: 3}, function(err, user) {
         if (err) throw err
         test.equal('joe', user.username)
         test.ok(user.streams)
@@ -436,23 +436,23 @@ var tests = testCase({
       })
     },
     'generate can link properties with count and generated item': function(test) {
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         title: function(callback) {
           callback(null, Faker.Company.catchPhrase())
         }
       })
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe',
         streams: (function(callback) {
-          blueprints.generate('Stream', function(err, stream) {
+          kin.generate('Stream', function(err, stream) {
             callback(null, stream._id)
           })
         })
       })
-      blueprints.generate('User', {streams: 6}, function(err, user) {
+      kin.generate('User', {streams: 6}, function(err, user) {
         if (err) throw err
         test.equal('joe', user.username)
         test.ok(user.streams)
@@ -464,23 +464,23 @@ var tests = testCase({
       })
     },
     'generate with linked properties can override properties': function(test) {
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         title: function(callback) {
           callback(null, Faker.Company.catchPhrase())
         }
       })
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         username: 'joe',
         streams: (function(callback) {
-          blueprints.generate('Stream', function(err, stream) {
+          kin.generate('Stream', function(err, stream) {
             callback(null, stream._id)
           })
         })
       })
-      blueprints.generate('User', {username: 'bill', streams: 5}, function(err, user) {
+      kin.generate('User', {username: 'bill', streams: 5}, function(err, user) {
         if (err) throw err
         test.equal('bill', user.username)
         test.ok(user.streams)
@@ -492,7 +492,7 @@ var tests = testCase({
       })
     },
     'generate _ properties doesn\'t actually create the property': function(test) {
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         title: function(callback) {
@@ -501,18 +501,18 @@ var tests = testCase({
       })
       var streams = []
       var count = 0
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         _id : uuid(),
         username: 'joe',
         _streams: function(callback) {
-          blueprints.generate('Stream', {title: count++, userId: this._id}, function(err, stream) {
+          kin.generate('Stream', {title: count++, userId: this._id}, function(err, stream) {
             streams.push(stream)
             callback()
           })
         }
       }),
-      blueprints.generate('User', {_streams: 5}, function(err, user) {
+      kin.generate('User', {_streams: 5}, function(err, user) {
         test.equal('joe', user.username)
         test.ok(!user._streams)
         test.ok(!user.streams)
@@ -524,7 +524,7 @@ var tests = testCase({
       })
     },
     'generate _ properties doesn\'t actually create the property, and can be referenced': function(test) {
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         title: function(callback) {
@@ -534,19 +534,19 @@ var tests = testCase({
       var streams = []
       var count = 0
       var self = this
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         _id : uuid(),
         username: 'joe',
         _someNumber: 4,
         _streams: function(callback) {
-          blueprints.generate('Stream', {title: this._someNumber.toString(), userId: this._id}, function(err, stream) {
+          kin.generate('Stream', {title: this._someNumber.toString(), userId: this._id}, function(err, stream) {
             streams.push(stream)
             callback()
           })
         }
       }),
-      blueprints.generate('User', {_streams: 5}, function(err, user) {
+      kin.generate('User', {_streams: 5}, function(err, user) {
         test.equal('joe', user.username)
         test.ok(!user._streams)
         test.ok(!user.streams)
@@ -561,7 +561,7 @@ var tests = testCase({
       })
     },
     'generate _ properties doesn\'t actually create the property, but does return it on second non-err param of callback': function(test) {
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         title: function(callback) {
@@ -571,19 +571,19 @@ var tests = testCase({
       var streams = []
       var count = 0
       var self = this
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         _id : uuid(),
         username: 'joe',
         _someNumber: 4,
         _streams: function(callback) {
-          blueprints.generate('Stream', {title: this._someNumber.toString(), userId: this._id}, function(err, stream) {
+          kin.generate('Stream', {title: this._someNumber.toString(), userId: this._id}, function(err, stream) {
             streams.push(stream)
             callback(null, stream)
           })
         }
       }),
-      blueprints.generate('User', {_streams: 5}, function(err, user, meta) {
+      kin.generate('User', {_streams: 5}, function(err, user, meta) {
         test.equal('joe', user.username)
         test.ok(meta.streams)
         test.equal(5, streams.length)
@@ -592,7 +592,7 @@ var tests = testCase({
       })
     },
     'handles simple nesting': function(test) {
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         title: function(callback) {
@@ -600,7 +600,7 @@ var tests = testCase({
         }
       })
 
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         _id: new ObjectId().toString(),
         username: Faker.Internet.userName(),
@@ -608,19 +608,19 @@ var tests = testCase({
           callback(null, Faker.Internet.email())
         },
         streams: function(callback) {
-          blueprints.generate('Stream', {_activities: 0}, function(err, stream) {
+          kin.generate('Stream', {_activities: 0}, function(err, stream) {
             callback(null, stream._id)
           })
         }
       })
-      blueprints.generate('User', {streams: 3}, function(err, user) {
+      kin.generate('User', {streams: 3}, function(err, user) {
         test.equal(3, user.streams.length)
         test.done()
       })
     },
     'handles simple nesting with _ properties': function(test) {
       var titles = []
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: new ObjectId().toString(),
         userId: null,
@@ -631,7 +631,7 @@ var tests = testCase({
         }
       })
 
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         _id: function(callback) {
           callback(null, new ObjectId().toString())
@@ -642,15 +642,15 @@ var tests = testCase({
         },
         streams: function(callback) {
           var self = this
-          blueprints.generate('Stream', {_title: 5}, function(err, stream) {
-            Blueprints.get(self, '_id', function(err, id) {
+          kin.generate('Stream', {_title: 5}, function(err, stream) {
+            Kin.get(self, '_id', function(err, id) {
               stream.userId = id
               callback(null, stream)
             })
           })
         }
       })
-      blueprints.generate('User', {streams: 3}, function(err, user) {
+      kin.generate('User', {streams: 3}, function(err, user) {
         test.equal(3, user.streams.length)
         test.equal(5 * user.streams.length, titles.length)
         test.ok(_.every(user.streams, function(stream) {
@@ -662,7 +662,7 @@ var tests = testCase({
     'handles 3 levels of nesting': function(test) {
       var activities = []
       var count = 0
-      blueprints.blueprint('Stream', {
+      kin.blueprint('Stream', {
         _model: Stream,
         _id: function(callback) {
           callback(null, new ObjectId().toString())
@@ -671,21 +671,21 @@ var tests = testCase({
           callback(null, Faker.Company.catchPhrase())
         },
         _activities: function(callback) {
-          blueprints.get('_id', function(err, id) {
-            blueprints.generate('Activity', {streamId: id}, function(err, activity) {
+          kin.get('_id', function(err, id) {
+            kin.generate('Activity', {streamId: id}, function(err, activity) {
               activities.push(activity)
               callback(err, activity)
             })
           })
         }
       })
-      blueprints.blueprint('Activity', {
+      kin.blueprint('Activity', {
         _model: Activity,
         title: function(callback) {
           callback(null, Faker.Company.catchPhrase())
         }
       })
-      blueprints.blueprint('User', {
+      kin.blueprint('User', {
         _model: User,
         _id: function(callback) {
           callback(null, new ObjectId().toString())
@@ -695,12 +695,12 @@ var tests = testCase({
           callback(null, Faker.Internet.email)
         },
         streams: function(callback) {
-          blueprints.generate('Stream', {_activities: 7}, function(err, stream) {
+          kin.generate('Stream', {_activities: 7}, function(err, stream) {
             callback(null, stream._id)
           })
         }
       })
-      blueprints.generate('User', {streams: 3}, function(err, user) {
+      kin.generate('User', {streams: 3}, function(err, user) {
         test.equal(3, user.streams.length)
         test.equal(user.streams.length * 7, activities.length)
         test.done()
@@ -715,7 +715,7 @@ var tests = testCase({
         callback()
       },
       'will handle nesting': function(test) {
-        blueprints.blueprint('Stream', {
+        kin.blueprint('Stream', {
           _model: Stream,
           _id: function(callback) {
             callback(null, new ObjectId().toString())
@@ -724,15 +724,15 @@ var tests = testCase({
             callback(null, Faker.Company.catchPhrase())
           },
           _activities: function(callback) {
-            blueprints.get('_id', function(err, id) {
-              blueprints.generate('Activity', {streamId: id}, function(err, activity) {
+            kin.get('_id', function(err, id) {
+              kin.generate('Activity', {streamId: id}, function(err, activity) {
                 activities.push(activity)
                 callback(err, activity)
               })
             })
           }
         })
-        blueprints.blueprint('Activity', {
+        kin.blueprint('Activity', {
           _model: Activity,
           _id: function(callback) {
             callback(null, new ObjectId().toString())
@@ -741,7 +741,7 @@ var tests = testCase({
             callback(null, Faker.Company.catchPhrase())
           }
         })
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: User,
           _id: function(callback) {
             callback(null, new ObjectId().toString())
@@ -751,12 +751,12 @@ var tests = testCase({
             callback(null, Faker.Internet.email())
           },
           streams: function(callback) {
-            blueprints.generate('Stream', {_activities: 7}, function(err, stream) {
+            kin.generate('Stream', {_activities: 7}, function(err, stream) {
               callback(null, new ObjectId().toString())
             })
           }
         })
-        blueprints.generate('User', {streams: 3}, function(err, user) {
+        kin.generate('User', {streams: 3}, function(err, user) {
           test.ok(!err)
           test.equal(3, user.streams.length)
           test.equal(user.streams.length * 7, activities.length)
@@ -764,11 +764,11 @@ var tests = testCase({
         })
       },
       'should generate valid mongoose models when given string _model': function(test) {
-        blueprints.blueprint('User', {
+        kin.blueprint('User', {
           _model: 'User',
           username: 'joe'
         })
-        blueprints.generate('User', function(err, model) {
+        kin.generate('User', function(err, model) {
           if (err) throw err
 
           test.ok(model && model instanceof User)

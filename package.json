@@ -1,7 +1,7 @@
 {
   "author": "Tim Oxley <secoif@gmail.com> (https://github.com/secoif)",
-  "name": "blueprints",
-  "description": "Fixture generator",
+  "name": "kin",
+  "description": "Hierarchial Fixture Generator",
   "version": "0.0.1",
   "repository": {
     "type": "git",
