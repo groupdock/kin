@@ -9,7 +9,7 @@ var StreamSchema = new Schema({
 })
 var UserSchema = new Schema({
   username: String,
-  email: String, 
+  email: String,
   streams: [{ type: Schema.ObjectId, ref: 'Stream', index: true}],
 })
 
