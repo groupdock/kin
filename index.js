@@ -1,1 +1,1 @@
-module.exports = require('./lib/kin');
+module.exports = require('./lib/kin')

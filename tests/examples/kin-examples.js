@@ -220,6 +220,10 @@ var GeneratedUserWithDocumentsExample =
 var mongoose = require('mongoose')
 mongoose.connect('kin_examples')
 
+// If you want to use mongoose with Kin, you need to pass your reference to mongoose to Kin
+
+kin.mongoose = mongoose
+
 /* Some fixtures we prepared earlier */
 User = require('../fixtures').User // Same as our user before, except as a Mongoose model
 Stream = require('../fixtures').Stream // Imagine a stream is like an RSS feed containing 'Activities'

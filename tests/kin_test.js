@@ -4,7 +4,8 @@ var testCase = require('nodeunit').testCase,
     EventEmitter = require('events').EventEmitter,
     Kin = require('../lib/kin'),
     uuid = require('node-uuid'),
-    ObjectId = require('mongoose').Types.ObjectId,
+    mongoose = require('mongoose'),
+    ObjectId = mongoose.Types.ObjectId,
     Faker = require('Faker'),
     _ = require('underscore')
 
@@ -17,7 +18,7 @@ var kin
 
 var tests = testCase({
   setUp: function(callback) {
-    kin = new Kin()
+    kin = new Kin(mongoose)
     // mock 'models'
     User = function(properties) {
       this._id = uuid()
