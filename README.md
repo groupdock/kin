@@ -48,8 +48,8 @@ time.
 ```javascript
 kin.generate('User', function(err, user) {
   kin.generate('User', function(err, anotherUser) {
-assert.equal(anotherUser.username, user.username)
-assert.equal(anotherUser.email, user.email)
+    assert.equal(anotherUser.username, user.username)
+    assert.equal(anotherUser.email, user.email)
   })
 })
 ```
