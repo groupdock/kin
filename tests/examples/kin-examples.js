@@ -1,3 +1,5 @@
+'use strict'
+
 var Kin = require('../../lib/kin')
 var Faker = require('Faker')
 var assert = require('assert')
@@ -175,7 +177,7 @@ kin.generate('User', {documents: 5}, function(err, user) {
 })
 
 /* Example output for kin.generate('User', {documents: 5}) */
-var GeneratedUserWithDocumentsExample = 
+var GeneratedUserWithDocumentsExample =
 {
   username: 'Lydia',
   email: 'Jaron@angie.biz',
@@ -225,9 +227,9 @@ mongoose.connect('kin_examples')
 kin.mongoose = mongoose
 
 /* Some fixtures we prepared earlier */
-User = require('../fixtures').User // Same as our user before, except as a Mongoose model
-Stream = require('../fixtures').Stream // Imagine a stream is like an RSS feed containing 'Activities'
-Activity = require('../fixtures').Activity // each Activity references a Stream ID
+var User = require('../fixtures').User // Same as our user before, except as a Mongoose model
+var Stream = require('../fixtures').Stream // Imagine a stream is like an RSS feed containing 'Activities'
+var Activity = require('../fixtures').Activity // each Activity references a Stream ID
 
 kin.blueprint('Stream', {
   _model: 'Stream',
