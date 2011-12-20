@@ -321,9 +321,8 @@ kin.post('User', function(user, meta, callback) {
   })
 })
 kin.generate('User', {_streams: 0}, function(err, user, meta) {
-  // ensure user was saved
   User.findById(user._id, function(err, found) {
-    assert.ok(found)
+    assert.ok(found) // ensure user was saved
   })
 })
 
@@ -349,13 +348,11 @@ kin.post('User', function(user, meta, callback) {
 })
 
 kin.generate('User', {_streams: 3}, function(err, user, meta) {
-  // ensure user was saved
   User.findById(user._id, function(err, found) {
-    assert.ok(found)
+    assert.ok(found) // ensure user was saved
   })
-  // ensure our 3 streams were saved
   Stream.find(function(err, found) {
-    assert.equal(found.length, 3)
+    assert.equal(found.length, 3) // ensure our 3 streams were saved
   })
 })
 

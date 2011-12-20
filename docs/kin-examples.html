@@ -160,7 +160,7 @@ save you having to manually <code>require</code> every model in your system.</p>
   <span class="nx">_model</span><span class="o">:</span> <span class="s1">&#39;Stream&#39;</span><span class="p">,</span>
   <span class="nx">title</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">Faker</span><span class="p">.</span><span class="nx">Lorem</span><span class="p">.</span><span class="nx">words</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">pop</span><span class="p">())</span>
-  <span class="p">}</span>    
+  <span class="p">}</span>
 <span class="p">})</span>
 
 <span class="nx">kin</span><span class="p">.</span><span class="nx">blueprint</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="p">{</span>
@@ -210,6 +210,55 @@ third parameter, without the _ prefix.</p>             </td>             <td cla
 <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">_documents</span><span class="o">:</span> <span class="mi">4</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">_documents</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">)</span>
   <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">meta</span><span class="p">.</span><span class="nx">documents</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="p">})</span></pre></div>             </td>           </tr>                               <tr id="section-29">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-29">&#182;</a>               </div>               <h2>Applying post processing to a generator</h2>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-30">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-30">&#182;</a>               </div>               <p>Sometimes you always want to apply a certain action to every model generated
+by your kin instance. e.g. saving a model. Kin allows you to apply 'post' 
+functions for exactly this situation. <em>Remember</em> you must call the callback
+with the 'meta' property if you want to keep your meta data.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">ObjectId</span> <span class="o">=</span> <span class="nx">mongoose</span><span class="p">.</span><span class="nx">Types</span><span class="p">.</span><span class="nx">ObjectId</span>
+
+<span class="nx">kin</span><span class="p">.</span><span class="nx">blueprint</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">_model</span><span class="o">:</span> <span class="s1">&#39;User&#39;</span><span class="p">,</span>
+  <span class="nx">_streams</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;Stream&#39;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="nx">title</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">Faker</span><span class="p">.</span><span class="nx">Lorem</span><span class="p">.</span><span class="nx">words</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">pop</span><span class="p">())</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+<span class="nx">kin</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">saveErr</span><span class="p">,</span> <span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="nx">saveErr</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+<span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">_streams</span><span class="o">:</span> <span class="mi">0</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">found</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">assert</span><span class="p">.</span><span class="nx">ok</span><span class="p">(</span><span class="nx">found</span><span class="p">)</span> <span class="c1">// ensure user was saved</span>
+  <span class="p">})</span>
+<span class="p">})</span></pre></div>             </td>           </tr>                               <tr id="section-31">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-31">&#182;</a>               </div>               <p>Example: if you also want to save nested items, you could do
+this in the 'top level' generator's post function (e.g. save documents via 
+documents stored in the meta parameter in User's post function)</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">kin</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">saveErr</span><span class="p">,</span> <span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">numSavedStreams</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">meta</span><span class="p">.</span><span class="nx">streams</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">stream</span> <span class="o">=</span> <span class="nx">meta</span><span class="p">.</span><span class="nx">streams</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+      <span class="kd">var</span> <span class="nx">streamSaveErrs</span>
+      <span class="nx">stream</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">streamSaveErr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">streamSaveErrs</span> <span class="o">=</span> <span class="nx">streamSaveErr</span>
+        <span class="nx">numSavedStreams</span><span class="o">++</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">numSavedStreams</span> <span class="o">==</span> <span class="nx">meta</span><span class="p">.</span><span class="nx">streams</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">callback</span><span class="p">(</span><span class="nx">saveErr</span> <span class="o">||</span> <span class="nx">streamSaveErrs</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span>
+        <span class="p">}</span>
+      <span class="p">})</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">_streams</span><span class="o">:</span> <span class="mi">3</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">found</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">assert</span><span class="p">.</span><span class="nx">ok</span><span class="p">(</span><span class="nx">found</span><span class="p">)</span> <span class="c1">// ensure user was saved</span>
+  <span class="p">})</span>
+  <span class="nx">Stream</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">found</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">found</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1">// ensure our 3 streams were saved</span>
+  <span class="p">})</span>
 <span class="p">})</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

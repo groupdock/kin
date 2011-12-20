@@ -394,3 +394,68 @@ kin.generate('User', {_documents: 4}, function(err, user, meta) {
   assert.equal(meta.documents.length, 4)
 })
 ```
+
+
+## Applying post processing to a generator
+
+Sometimes you always want to apply a certain action to every model generated
+by your kin instance. e.g. saving a model. Kin allows you to apply 'post'
+functions for exactly this situation. _Remember_ you must call the callback
+with the 'meta' property if you want to keep your meta data.
+
+```javascript    
+var ObjectId = mongoose.Types.ObjectId
+
+kin.blueprint('User', {
+	_model: 'User',
+	_streams: function(callback) {
+		kin.generate('Stream', callback)
+	},
+	title: function(callback) {
+		callback(null, Faker.Lorem.words(1).pop())
+	}
+})
+kin.post('User', function(user, meta, callback) {
+	user.save(function(saveErr, user) {
+		callback(saveErr, user, meta)
+	})
+})
+kin.generate('User', {_streams: 0}, function(err, user, meta) {
+	User.findById(user._id, function(err, found) {
+		assert.ok(found) // ensure user was saved
+	})
+})
+```
+
+Example: if you also want to save nested items, you could do this in the 'top
+level' generator's post function (e.g. save documents via documents stored in
+the meta parameter in User's post function)
+
+    
+```javascript    
+kin.post('User', function(user, meta, callback) {
+	user.save(function(saveErr, user) {
+		var numSavedStreams = 0
+		for(var i = 0; i < meta.streams.length; i++) {
+			var stream = meta.streams[i]
+			var streamSaveErrs
+			stream.save(function(streamSaveErr) {
+				streamSaveErrs = streamSaveErr
+				numSavedStreams++
+				if (numSavedStreams == meta.streams.length) {
+					callback(saveErr || streamSaveErrs, user, meta)
+				}
+			})
+		}
+	})
+})
+
+kin.generate('User', {_streams: 3}, function(err, user, meta) {
+	User.findById(user._id, function(err, found) {
+		assert.ok(found) // ensure user was saved
+	})
+	Stream.find(function(err, found) {
+		assert.equal(found.length, 3) // ensure our 3 streams were saved
+	})
+})
+```
