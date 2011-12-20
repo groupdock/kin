@@ -191,7 +191,6 @@ var tests = testCase({
         _model: User,
         username: 'joe'
       })
-
       kin.generate('User', {username: 'joe'}, function(err, model) {
         if (err) throw err
         test.equal('joe', model.username)
@@ -778,7 +777,76 @@ var tests = testCase({
           test.done()
         })
       }
-    })
+    }),
+    'generator function': {
+      'called with one argument, generates a generator function': function(test) {
+        kin.blueprint('User', {
+          username: 'joe'
+        })
+        var userGenerator = kin.generate('User')
+        test.equal('function', typeof userGenerator)
+        userGenerator(function(err, user) {
+          if (err) throw err
+          test.ok(user)
+          test.equal(user.username, 'joe')
+          test.done()
+        })
+      },
+      'can be passed overridden properties': function(test) {
+        kin.blueprint('User', {
+          username: 'joe'
+        })
+        var userGenerator = kin.generate('User')
+        userGenerator({username: 'bob'}, function(err, user) {
+          if (err) throw err
+          test.ok(user)
+          test.equal(user.username, 'bob')
+          test.done()
+        })
+      },
+      'generator function can have post functions given to it': function(test) {
+        kin.blueprint('User', {
+          _model: 'User',
+          username: 'joe'
+        })
+        var userGenerator = kin.generate('User')
+        userGenerator.post(function(user, meta, callback) {
+          user.username = 'bill'
+          callback(null, user, meta)
+        })
+        userGenerator({username: 'bob'}, function(err, user) {
+          if (err) throw err
+          test.ok(user)
+          test.equal(user.username, 'bill')
+          test.done()
+        })
+      },
+      'generator function can have multiple post functions given to it': function(test) {
+        kin.blueprint('User', {
+          _model: 'User',
+          username: 'joe'
+        })
+        var userGenerator = kin.generate('User')
+        userGenerator.post(function(user, meta, callback) {
+          user.username = 'bill'
+          callback(null, user, meta)
+        })
+        userGenerator.post(function(user, meta, callback) {
+          test.equal(user.username, 'bill')
+          user.username = user.username + 'gary'
+          user.email = 'gary@example.com'
+          callback(null, user, meta)
+        })
+        userGenerator({username: 'bob'}, function(err, user) {
+          if (err) throw err
+          test.ok(user)
+          test.equal(user.username, 'billgary')
+          test.equal(user.email, 'gary@example.com')
+          test.done()
+        })
+      }
+
+    }
   },
   'post functions': {
     'should apply when generating an item': function(test) {
@@ -820,7 +888,6 @@ var tests = testCase({
         test.ok(executed)
         test.done()
       })
-
     }
   }
 })

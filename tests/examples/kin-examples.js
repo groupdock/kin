@@ -12,20 +12,20 @@ var kin = new Kin()
 //## Fixed Values
 
 // Create a User blueprint with fixed values for properties
-kin.blueprint('User', {
+kin.blueprint('UserA', {
   username: 'joe',
   email: 'joe@example.com'
 })
 
 // Generate a User object. The returned user will have the properties
 // supplied in the template.
-kin.generate('User', function(err, user) {
+kin.generate('UserA', function(err, user) {
   assert.deepEqual(user, {username: 'joe', email: 'joe@example.com'})
 })
 
 // As expected, if we generate another User, we'll get the same values every time.
-kin.generate('User', function(err, user) {
-  kin.generate('User', function(err, anotherUser) {
+kin.generate('UserA', function(err, user) {
+  kin.generate('UserA', function(err, anotherUser) {
     assert.equal(anotherUser.username, user.username)
     assert.equal(anotherUser.email, user.email)
   })
@@ -35,14 +35,14 @@ kin.generate('User', function(err, user) {
 
 // You can optionally pass a second parameter to `generate`. These values
 // will override any values provided in the blueprint.
-kin.generate('User', {username: 'bill'}, function(err, user) {
+kin.generate('UserA', {username: 'bill'}, function(err, user) {
   assert.equal(user.username, 'bill') // uses the overridden value
   assert.equal(user.email, 'joe@example.com') // uses the blueprint value
 })
 
 // Overriding properties can also contain keys that aren't specified in
 // the original blueprint.
-kin.generate('User', {manager: 'alice'}, function(err, user) {
+kin.generate('UserA', {manager: 'alice'}, function(err, user) {
   assert.equal(user.username, 'joe') // uses the blueprint value
   assert.equal(user.email, 'joe@example.com') // uses the blueprint value
   assert.equal(user.manager, 'alice') // non-blueprint key
@@ -52,12 +52,12 @@ kin.generate('User', {manager: 'alice'}, function(err, user) {
 //## Instantiating Custom Models
 
 // Kin can optionally generate custom models for you, so long as your model's
-// constructor takes a set of properties. 
+// constructor takes a set of properties.
 
 // For instance, you might use this as your model's constructor:
 
 /* User Constructor */
-var User = function(properties) {
+var UserB = function(properties) {
   properties = properties || {}
   this.username = properties.username
   this.email = properties.email || this.username + '@example.com'
@@ -65,8 +65,8 @@ var User = function(properties) {
 
 // Specify the constructor you'd like to use with the special `_model` property.
 // *Note:* you won't find the _model property on the generated object.
-kin.blueprint('User', {
-  _model: User,
+kin.blueprint('UserB', {
+  _model: UserB,
   username: function(callback) {
     callback(null, Faker.Internet.userName()) 
   }
@@ -74,10 +74,10 @@ kin.blueprint('User', {
 
 // Kin will use the supplied constructor when generating this model,
 // passing-in any generated values as the first (and only) argument.
-kin.generate('User', function(err, user) {
+kin.generate('UserB', function(err, user) {
   assert.ok(user.username && user.username.length)
   assert.equal(user.email, user.username + '@example.com') // Test against constructor behaviour to ensure it was used. 
-  assert.ok(user instanceof User)
+  assert.ok(user instanceof UserB)
   assert.equal(user._model, undefined) // _model is not stored on the object
 })
 
@@ -87,7 +87,7 @@ kin.generate('User', function(err, user) {
 // Generating fixed values isn't much fun. We can also 
 // define asyncronous functions as dynamic generators for properties.
 
-kin.blueprint('User', {
+kin.blueprint('UserC', {
   username: function(callback) {
     callback(null, Faker.Internet.userName())
   },
@@ -96,7 +96,7 @@ kin.blueprint('User', {
   }
 })
 
-kin.generate('User', function(err, user) {
+kin.generate('UserC', function(err, user) {
   assert.ok(user.username) // some random username as defined by Faker, eg "Rupert_Mertz"
   assert.ok(user.email) // some random email as defined by Faker, eg "Brook_Bednar@price.us"
 })
@@ -104,8 +104,8 @@ kin.generate('User', function(err, user) {
 // Generating another user should always run the matching generation
 // function, generating different data each time
 
-kin.generate('User', function(err, user) {
-  kin.generate('User', function(err, anotherUser) {
+kin.generate('UserC', function(err, user) {
+  kin.generate('UserC', function(err, anotherUser) {
     assert.notEqual(anotherUser.username, user.username)
     assert.notEqual(anotherUser.email, user.email)
   })
@@ -157,7 +157,7 @@ kin.generate('Document', {tags: 30}, function(err, document) {
 // A common use case for generating multiple values is creating
 // multi-level model hierarchies.
 
-kin.blueprint('User', {
+kin.blueprint('UserD', {
   username: function(callback) {
     callback(null, Faker.Internet.userName())
   },
@@ -172,7 +172,7 @@ kin.blueprint('User', {
 // We can easily generate a `User` with some number of `Document`s by
 // simply passing a number as the value of the documents property.
 
-kin.generate('User', {documents: 5}, function(err, user) {
+kin.generate('UserD', {documents: 5}, function(err, user) {
   assert.equal(user.documents.length, 5)
 })
 
@@ -238,7 +238,7 @@ kin.blueprint('Stream', {
   }
 })
 
-kin.blueprint('User', {
+kin.blueprint('UserE', {
   _model: 'User', // Note use of a String here
   username: function(callback) {
     callback(null, Faker.Internet.userName())
@@ -255,7 +255,7 @@ kin.blueprint('User', {
   }
 })
 
-kin.generate('User', function(err, user) {
+kin.generate('UserE', function(err, user) {
   _.each(user.streams, function(streamId) {
     /* The streams we generated should be saved in the DB */
     Stream.findById(streamId, function(err, found) {
@@ -282,7 +282,7 @@ kin.generate('User', function(err, user) {
 
 var ObjectId = mongoose.Types.ObjectId
 
-kin.blueprint('User', {
+kin.blueprint('UserF', {
   _documents: function(callback) {
     kin.generate('Document', {tags: 3}, callback)
   },
@@ -291,7 +291,7 @@ kin.blueprint('User', {
   }
 })
 
-kin.generate('User', {_documents: 4}, function(err, user, meta) {
+kin.generate('UserF', {_documents: 4}, function(err, user, meta) {
   assert.equal(user._documents, undefined)
   assert.equal(meta.documents.length, 4)
 })
@@ -306,7 +306,7 @@ kin.generate('User', {_documents: 4}, function(err, user, meta) {
 
 var ObjectId = mongoose.Types.ObjectId
 
-kin.blueprint('User', {
+kin.blueprint('UserG', {
   _model: 'User',
   _streams: function(callback) {
     kin.generate('Stream', callback)
@@ -315,12 +315,14 @@ kin.blueprint('User', {
     callback(null, Faker.Lorem.words(1).pop())
   }
 })
-kin.post('User', function(user, meta, callback) {
+
+kin.post('UserG', function(user, meta, callback) {
   user.save(function(saveErr, user) {
     callback(saveErr, user, meta)
   })
 })
-kin.generate('User', {_streams: 0}, function(err, user, meta) {
+
+kin.generate('UserG', {_streams: 0}, function(err, user, meta) {
   User.findById(user._id, function(err, found) {
     assert.ok(found) // ensure user was saved
   })
@@ -330,7 +332,7 @@ kin.generate('User', {_streams: 0}, function(err, user, meta) {
 // this in the 'top level' generator's post function (e.g. save documents via 
 // documents stored in the meta parameter in User's post function)
 
-kin.post('User', function(user, meta, callback) {
+kin.post('UserG', function(user, meta, callback) {
   user.save(function(saveErr, user) {
     var numSavedStreams = 0
     for(var i = 0; i < meta.streams.length; i++) {
@@ -347,7 +349,7 @@ kin.post('User', function(user, meta, callback) {
   })
 })
 
-kin.generate('User', {_streams: 3}, function(err, user, meta) {
+kin.generate('UserG', {_streams: 3}, function(err, user, meta) {
   User.findById(user._id, function(err, found) {
     assert.ok(found) // ensure user was saved
   })
