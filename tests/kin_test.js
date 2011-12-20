@@ -779,6 +779,49 @@ var tests = testCase({
         })
       }
     })
+  },
+  'post functions': {
+    'should apply when generating an item': function(test) {
+      kin.blueprint('User', {
+        _model: User,
+        username: 'joe'
+      })
+      var executed = false
+      kin.post('User', function(user, meta, callback) {
+        executed = true
+        callback(null, user, meta)
+      })
+      kin.generate('User', function(err, model) {
+        test.ok(model)
+        test.ok(executed)
+        test.done()
+      })
+
+    },
+    'should apply multiple post functions in order when generating an item': function(test) {
+      test.expect(4)
+      kin.blueprint('User', {
+        _model: User,
+        username: 'joe'
+      })
+      var executed = false
+      kin.post('User', function(user, meta, callback) {
+        executed = true
+        callback(null, user, meta)
+      })
+      kin.post('User', function(user, meta, callback) {
+        test.ok(executed)
+        callback(null, user, meta)
+      })
+
+      kin.generate('User', function(err, model, meta) {
+        test.ok(model)
+        test.ok(meta)
+        test.ok(executed)
+        test.done()
+      })
+
+    }
   }
 })
 
