@@ -2,6 +2,11 @@
   "author": "Tim Oxley <secoif@gmail.com> (https://github.com/secoif)",
   "name": "kin",
   "description": "Generate Hierarchial Families of Fixtures",
+  "homepage": "http://dev.groupdock.com/kin/",
+  "keywords": [
+    "test",
+    "fixtures"
+  ],
   "version": "0.0.1",
   "repository": {
     "type": "git",
@@ -23,6 +28,5 @@
     "Faker": "~0.1.3",
     "mongoose": "~2.4.5",
     "nodeunit": "~0.6.4"
-  },
-  "homepage": "http://dev.groupdock.com/kin/"
+  }
 }
