@@ -362,27 +362,55 @@ kin.generate('UserG', {_streams: 3}, function(err, user, meta) {
 
 
 /* Simple example */
-var generateUser = kin.generate('UserA')
+var generateUserSimple = kin.generate('UserA')
 
-generateUser(function(err, user, meta) {
+generateUserSimple(function(err, user, meta) {
   assert.deepEqual(user, {username: 'joe', email: 'joe@example.com'}) // as normal
 })
 
 // Pass override properties when creating the generator function or when
-// generating objects
+// generating objects.
 
 /*
  * All Users generated with this function will by default have username: bill,
  * overriding the value `joe` provided in the blueprint.
  */
-var generateUser = kin.generate('UserA', {username: 'bill'})
+var generateUserWithOverrides = kin.generate('UserA', {username: 'bill'})
 
-generateUser(function(err, user, meta) {
+generateUserWithOverrides(function(err, user, meta) {
   assert.deepEqual(user, {username: 'bill', email: 'joe@example.com'}) // as normal
 })
 
-generateUser({email: 'bill@example.com'}, function(err, user, meta) {
+generateUserWithOverrides({email: 'bill@example.com'}, function(err, user, meta) {
   assert.deepEqual(user, {username: 'bill', email: 'bill@example.com'}) // as normal
 })
 
+// ## Applying post processing to a generator function
+// The main use of generator functions is to apply custom post generation
+// processing such as saving a model. This means you can have the master
+// blueprint only contain basic, generic data, and apply persistance
+// or transformations on a case-by-case basis.
+
+var generateSavedUser = kin.generate('UserH') // mongoose enhanced user
+kin.blueprint('UserH', {
+  _model: 'User',
+  username: function(callback) {
+    callback(null, Faker.Internet.userName())
+  },
+  email: function(callback) {
+    callback(null, Faker.Internet.email())
+  }
+})
+
+generateSavedUser.post(function(user, meta, callback) {
+  user.save(function(err, user) {
+    callback(err, user, meta)
+  })
+})
+
+generateSavedUser(function(err, user) {
+  User.findById(user._id, function(err, found) {
+    assert.ok(found)
+  })
+})
 

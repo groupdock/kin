@@ -261,23 +261,49 @@ with the 'meta' property if you want to keep your meta data.</p>             </t
 to a generator, in a certain situation. To create a generator function
 simply call <code>generate</code> with no callback. You can use generator functions
 just like normal, or use their additional properties to make modifications.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="cm">/* Simple example */</span>
-<span class="kd">var</span> <span class="nx">generateUser</span> <span class="o">=</span> <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;UserA&#39;</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">generateUserSimple</span> <span class="o">=</span> <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;UserA&#39;</span><span class="p">)</span>
 
-<span class="nx">generateUser</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">generateUserSimple</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">assert</span><span class="p">.</span><span class="nx">deepEqual</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="p">{</span><span class="nx">username</span><span class="o">:</span> <span class="s1">&#39;joe&#39;</span><span class="p">,</span> <span class="nx">email</span><span class="o">:</span> <span class="s1">&#39;joe@example.com&#39;</span><span class="p">})</span> <span class="c1">// as normal</span>
 <span class="p">})</span></pre></div>             </td>           </tr>                               <tr id="section-33">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-33">&#182;</a>               </div>               <p>Pass override properties when creating the generator function or when
-generating objects</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="cm">/*</span>
+generating objects.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="cm">/*</span>
 <span class="cm"> * All Users generated with this function will by default have username: bill,</span>
 <span class="cm"> * overriding the value `joe` provided in the blueprint.</span>
 <span class="cm"> */</span>
-<span class="kd">var</span> <span class="nx">generateUser</span> <span class="o">=</span> <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;UserA&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">username</span><span class="o">:</span> <span class="s1">&#39;bill&#39;</span><span class="p">})</span>
+<span class="kd">var</span> <span class="nx">generateUserWithOverrides</span> <span class="o">=</span> <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;UserA&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">username</span><span class="o">:</span> <span class="s1">&#39;bill&#39;</span><span class="p">})</span>
 
-<span class="nx">generateUser</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">generateUserWithOverrides</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">assert</span><span class="p">.</span><span class="nx">deepEqual</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="p">{</span><span class="nx">username</span><span class="o">:</span> <span class="s1">&#39;bill&#39;</span><span class="p">,</span> <span class="nx">email</span><span class="o">:</span> <span class="s1">&#39;joe@example.com&#39;</span><span class="p">})</span> <span class="c1">// as normal</span>
 <span class="p">})</span>
 
-<span class="nx">generateUser</span><span class="p">({</span><span class="nx">email</span><span class="o">:</span> <span class="s1">&#39;bill@example.com&#39;</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">generateUserWithOverrides</span><span class="p">({</span><span class="nx">email</span><span class="o">:</span> <span class="s1">&#39;bill@example.com&#39;</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span> <span class="p">{</span>
   <span class="nx">assert</span><span class="p">.</span><span class="nx">deepEqual</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="p">{</span><span class="nx">username</span><span class="o">:</span> <span class="s1">&#39;bill&#39;</span><span class="p">,</span> <span class="nx">email</span><span class="o">:</span> <span class="s1">&#39;bill@example.com&#39;</span><span class="p">})</span> <span class="c1">// as normal</span>
+<span class="p">})</span></pre></div>             </td>           </tr>                               <tr id="section-34">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-34">&#182;</a>               </div>               <h2>Applying post processing to a generator function</h2>
+
+<p>The main use of generator functions is to apply custom post generation
+processing such as saving a model. This means you can have the master
+blueprint only contain basic, generic data, and apply persistance
+or transformations on a case-by-case basis.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">generateSavedUser</span> <span class="o">=</span> <span class="nx">kin</span><span class="p">.</span><span class="nx">generate</span><span class="p">(</span><span class="s1">&#39;UserH&#39;</span><span class="p">)</span> <span class="c1">// mongoose enhanced user</span>
+<span class="nx">kin</span><span class="p">.</span><span class="nx">blueprint</span><span class="p">(</span><span class="s1">&#39;UserH&#39;</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">_model</span><span class="o">:</span> <span class="s1">&#39;User&#39;</span><span class="p">,</span>
+  <span class="nx">username</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">Faker</span><span class="p">.</span><span class="nx">Internet</span><span class="p">.</span><span class="nx">userName</span><span class="p">())</span>
+  <span class="p">},</span>
+  <span class="nx">email</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">Faker</span><span class="p">.</span><span class="nx">Internet</span><span class="p">.</span><span class="nx">email</span><span class="p">())</span>
+  <span class="p">}</span>
+<span class="p">})</span>
+
+<span class="nx">generateSavedUser</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">user</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">callback</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">,</span> <span class="nx">meta</span><span class="p">)</span>
+  <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="nx">generateSavedUser</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">user</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">User</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">_id</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">found</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">assert</span><span class="p">.</span><span class="nx">ok</span><span class="p">(</span><span class="nx">found</span><span class="p">)</span>
+  <span class="p">})</span>
 <span class="p">})</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
