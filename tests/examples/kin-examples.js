@@ -328,26 +328,20 @@ kin.generate('UserG', {_streams: 0}, function(err, user, meta) {
   })
 })
 
-// Example: if you also want to save nested items, you could do
-// this in the 'top level' generator's post function (e.g. save documents via 
-// documents stored in the meta parameter in User's post function)
+// Example: `save` all generated Users and Streams
 
 kin.post('UserG', function(user, meta, callback) {
-  user.save(function(saveErr, user) {
-    var numSavedStreams = 0
-    for(var i = 0; i < meta.streams.length; i++) {
-      var stream = meta.streams[i]
-      var streamSaveErrs
-      stream.save(function(streamSaveErr) {
-        streamSaveErrs = streamSaveErr
-        numSavedStreams++
-        if (numSavedStreams == meta.streams.length) {
-          callback(saveErr || streamSaveErrs, user, meta)
-        }
-      })
-    }
+  user.save(function(err, user) {
+    callback(err, user, meta)
   })
 })
+
+kin.post('Stream', function(stream, meta, callback) {
+  stream.save(function(err, stream) {
+    callback(err, stream, meta)
+  })
+})
+
 
 kin.generate('UserG', {_streams: 3}, function(err, user, meta) {
   User.findById(user._id, function(err, found) {
@@ -358,5 +352,37 @@ kin.generate('UserG', {_streams: 3}, function(err, user, meta) {
   })
 })
 
+
+
+// ## Generator functions
+// Generator functions can be created so you can apply specific changes
+// to a generator, in a certain situation. To create a generator function
+// simply call `generate` with no callback. You can use generator functions
+// just like normal, or use their additional properties to make modifications.
+
+
+/* Simple example */
+var generateUser = kin.generate('UserA')
+
+generateUser(function(err, user, meta) {
+  assert.deepEqual(user, {username: 'joe', email: 'joe@example.com'}) // as normal
+})
+
+// Pass override properties when creating the generator function or when
+// generating objects
+
+/*
+ * All Users generated with this function will by default have username: bill,
+ * overriding the value `joe` provided in the blueprint.
+ */
+var generateUser = kin.generate('UserA', {username: 'bill'})
+
+generateUser(function(err, user, meta) {
+  assert.deepEqual(user, {username: 'bill', email: 'joe@example.com'}) // as normal
+})
+
+generateUser({email: 'bill@example.com'}, function(err, user, meta) {
+  assert.deepEqual(user, {username: 'bill', email: 'bill@example.com'}) // as normal
+})
 
 

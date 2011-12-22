@@ -779,12 +779,12 @@ var tests = testCase({
       }
     }),
     'generator function': {
-      'called with one argument, generates a generator function': function(test) {
+      'called with no callback, generates a generator function': function(test) {
         kin.blueprint('User', {
           username: 'joe'
         })
         var userGenerator = kin.generate('User')
-        test.equal('function', typeof userGenerator)
+        test.equal(typeof userGenerator, 'function')
         userGenerator(function(err, user) {
           if (err) throw err
           test.ok(user)
@@ -792,17 +792,44 @@ var tests = testCase({
           test.done()
         })
       },
-      'can be passed overridden properties': function(test) {
-        kin.blueprint('User', {
-          username: 'joe'
-        })
-        var userGenerator = kin.generate('User')
-        userGenerator({username: 'bob'}, function(err, user) {
-          if (err) throw err
-          test.ok(user)
-          test.equal(user.username, 'bob')
-          test.done()
-        })
+      'can be passed overridden properties': {
+        'when creating generator function': function(test) {
+          kin.blueprint('User', {
+            username: 'joe'
+          })
+          var userGenerator = kin.generate('User', {username: 'bob'})
+          userGenerator(function(err, user) {
+            if (err) throw err
+            test.ok(user)
+            test.equal(user.username, 'bob')
+            test.done()
+          })
+        },
+        'at generate time' : function(test) {
+          kin.blueprint('User', {
+            username: 'joe'
+          })
+          var userGenerator = kin.generate('User')
+          userGenerator({username: 'bob'}, function(err, user) {
+            if (err) throw err
+            test.ok(user)
+            test.equal(user.username, 'bob')
+            test.done()
+          })
+        },
+        'at both function creation and object generation time': function(test) {
+          kin.blueprint('User', {
+            username: 'joe',
+            email: 'joe@example.com'
+          })
+          var userGenerator = kin.generate('User', {username: 'bob'})
+          userGenerator({email: 'bob@example.com'}, function(err, user) {
+            if (err) throw err
+            test.ok(user)
+            test.equal(user.username, 'bob')
+            test.done()
+          })
+        }
       },
       'generator function can have post functions given to it': function(test) {
         kin.blueprint('User', {
@@ -844,7 +871,29 @@ var tests = testCase({
           test.equal(user.email, 'gary@example.com')
           test.done()
         })
-      }
+      },
+      'keeps a cache of all generated items': function(test) {
+        kin.blueprint('User', {
+          username: 'joe'
+        })
+        var userGenerator = kin.generate('User')
+        userGenerator(function(err, user) {
+          if (err) throw err
+          userGenerator({username: 'bob'}, function(err, user) {
+            if (err) throw err
+            test.ok(user)
+            test.equal(user.username, 'bob')
+            test.equal(userGenerator.items.length, 2)
+            test.ok(_.find(userGenerator.items, function(user) {
+              return user.username == 'bob'
+            }))
+            test.ok(_.find(userGenerator.items, function(user) {
+              return user.username == 'joe'
+            }))
+            test.done()
+          })
+        })
+      },
 
     }
   },
