@@ -371,7 +371,7 @@ has returned a value.
 
 ## Hidden or Meta properties
 
-all properties beginning with an _ are not saved on the object, and instead
+All properties beginning with an _ are not saved on the object, and instead
 are returned in the `generate` callback as properties of a third parameter,
 without the _ prefix.
 
