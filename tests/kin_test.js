@@ -938,6 +938,65 @@ var tests = testCase({
         test.done()
       })
     }
+  },
+  'blueprint can take a function instead of an object': {
+   'runs function': function(test) {
+      test.expect(1)
+      kin.blueprint('User', function(callback) {
+        test.ok(true)
+        callback()
+      })
+      kin.generate('User', function() {
+        test.done()
+      })
+    },
+    'can generate an object': function(test) {
+      kin.blueprint('User', function(callback) {
+        callback(null, {name: 'Bill'})
+      })
+      kin.generate('User', function(err, user) {
+        test.ok(!err)
+        test.ok(user)
+        test.equal(user.name, 'Bill')
+        test.done()
+      })
+    },
+    'can generate meta datas': function(test) {
+      kin.blueprint('User', function(callback) {
+        callback(null, {name: 'Bill'}, {count: 1})
+      })
+      kin.generate('User', function(err, user, meta) {
+        test.ok(!err)
+        test.ok(user)
+        test.equal(user.name, 'Bill')
+        test.equal(meta.count, 1)
+        test.done()
+      })
+    },
+
+    'can take override properties': function(test) {
+      kin.blueprint('User', function(callback) {
+        callback(null, {name: 'Bill'})
+      })
+      kin.generate('User', {name: 'Joe'}, function(err, user) {
+        test.ok(!err)
+        test.ok(user)
+        test.equal(user.name, 'Joe')
+        test.done()
+      })
+    },
+    'will override meta properties': function(test) {
+      kin.blueprint('User', function(callback) {
+        callback(null, {name: 'Bill'}, {count: 0})
+      })
+      kin.generate('User', {name: 'Joe', _count: 2}, function(err, user, meta) {
+        test.ok(!err)
+        test.ok(user)
+        test.equal(user.name, 'Joe')
+        test.equal(meta.count, 2)
+        test.done()
+      })
+    }
   }
 })
 
