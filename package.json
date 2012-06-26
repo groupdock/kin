@@ -17,7 +17,7 @@
     "test": "nodeunit tests && node tests/examples/kin-examples.js"
   },
   "engines": {
-    "node": "< 0.7.x"
+    "node": "*"
   },
   "dependencies": {
     "async": "~0.1.15",
