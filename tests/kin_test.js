@@ -287,6 +287,19 @@ var tests = testCase({
             test.equal('joe@example.com', model.email)
             test.done()
           })
+        },
+        'when supplied properties are null': function(test) {
+          kin.blueprint('User', {
+            _model: User,
+            username: 'joe',
+            email: 'joe@example.com'
+          })
+          kin.generate('User', {username: null}, function(err, model) {
+            if (err) throw err
+            test.equal(null, model.username)
+            test.equal('joe@example.com', model.email)
+            test.done()
+          })
         }
       },
       'should generate based on object blueprint with function': function(test) {
@@ -982,6 +995,18 @@ var tests = testCase({
         test.ok(!err)
         test.ok(user)
         test.equal(user.name, 'Joe')
+        test.done()
+      })
+    },
+
+    'can take null override property': function(test) {
+      kin.blueprint('User', function(callback) {
+        callback(null, {name: 'Bill'})
+      })
+      kin.generate('User', {name: null}, function(err, user) {
+        test.ok(!err)
+        test.ok(user)
+        test.equal(user.name, null)
         test.done()
       })
     },
